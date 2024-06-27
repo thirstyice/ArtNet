@@ -120,10 +120,6 @@ public:
                 break;
             }
             default: {
-                if (this->b_verbose) {
-                    Serial.print(F("Unsupported OpCode: "));
-                    Serial.println(this->getOpCode(), HEX);
-                }
                 op_code = OpCode::Unsupported;
                 break;
             }
@@ -138,23 +134,8 @@ public:
     auto subscribeArtDmxUniverse(uint8_t net, uint8_t subnet, uint8_t universe, const Fn &func)
     -> std::enable_if_t<arx::is_callable<Fn>::value>
     {
-        if (net > 0x7F) {
-            if (this->b_verbose) {
-                Serial.println(F("net should be less than 0x7F"));
-            }
-            return;
-        }
-        if (subnet > 0xF) {
-            if (this->b_verbose) {
-                Serial.println(F("subnet should be less than 0xF"));
-            }
-            return;
-        }
-        if (universe > 0xF) {
-            if (this->b_verbose) {
-                Serial.println(F("universe should be less than 0xF"));
-            }
-            return;
+        if (net > 0x7F || subnet > 0xF || universe > 0xF) {
+            return; // Out of range
         }
         uint16_t u = ((uint16_t)net << 8) | ((uint16_t)subnet << 4) | (uint16_t)universe;
         this->subscribeArtDmxUniverse(u, func);
@@ -253,11 +234,6 @@ public:
                 n = num;
             } else {
                 n = size / 3;
-                Serial.println(F("WARN: ArtNet packet size is less than requested LED numbers to forward"));
-                Serial.print(F("      requested: "));
-                Serial.print(num * 3);
-                Serial.print(F("      received : "));
-                Serial.println(size);
             }
             for (size_t pixel = 0; pixel < n; ++pixel) {
                 size_t idx = pixel * 3;
