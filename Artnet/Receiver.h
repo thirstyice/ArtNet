@@ -285,6 +285,12 @@ protected:
         this->stream = &s;
     }
 
+#if defined(NO_GLOBAL_INSTANCES) || defined(NO_GLOBAL_SERIAL)
+    Logger Log{nullptr};
+#else
+    Logger Log{&Serial};
+#endif
+
 private:
     bool checkID() const
     {

@@ -156,29 +156,20 @@ class Logger : public Decorator<Print> {
 	using Decorator::Decorator;
 	size_t write(uint8_t c) {
         size_t retVal = 0;
-        #if !defined(NO_GLOBAL_SERIAL) && !defined(NO_GLOBAL_INSTANCES)
-            if (Serial && enabled) {
+            if (pointer && enabled) {
                 retVal = pointer->write(c);
             }
-        #endif
         return retVal;
     }
     size_t write(const char* str, size_t length) {
         size_t retVal = 0;
-        #if !defined(NO_GLOBAL_SERIAL) && !defined(NO_GLOBAL_INSTANCES)
-            if (Serial && enabled) {
+            if (pointer && enabled) {
                 retVal = pointer->write(str, length);
             }
-        #endif
         return retVal;
     }
-
     bool enabled = false;
 };
-
-Logger Log(&Serial);
-
-
 
 }  // namespace art_net
 
