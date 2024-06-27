@@ -24,8 +24,6 @@ class Receiver_
     art_trigger::CallbackType callback_art_trigger;
     ArtPollReplyConfig art_poll_reply_config;
 
-    bool b_verbose {false};
-
 public:
 #if ARX_HAVE_LIBSTDCPLUSPLUS >= 201103L  // Have libstdc++11
 #else
@@ -48,18 +46,14 @@ public:
         }
 
         if (size > PACKET_SIZE) {
-            if (this->b_verbose) {
-                Serial.print(F("Packet size is unexpectedly too large: "));
-                Serial.println(size);
-            }
+            Log->print(F("Packet size is unexpectedly too large: "));
+            Log->println(size);
             size = PACKET_SIZE;
         }
         this->stream->read(this->packet.data(), size);
 
         if (!checkID()) {
-            if (this->b_verbose) {
-                Serial.println(F("Packet ID is not Art-Net"));
-            }
+            Log->println(F("Packet ID is not Art-Net"));
             return OpCode::ParseFailed;
         }
 
@@ -120,10 +114,8 @@ public:
                 break;
             }
             default: {
-                if (this->b_verbose) {
-                    Serial.print(F("Unsupported OpCode: "));
-                    Serial.println(this->getOpCode(), HEX);
-                }
+                Log->print(F("Unsupported OpCode: "));
+                Log->println(this->getOpCode(), HEX);
                 op_code = OpCode::Unsupported;
                 break;
             }
@@ -139,21 +131,15 @@ public:
     -> std::enable_if_t<arx::is_callable<Fn>::value>
     {
         if (net > 0x7F) {
-            if (this->b_verbose) {
-                Serial.println(F("net should be less than 0x7F"));
-            }
+            Log->println(F("net should be less than 0x7F"));
             return;
         }
         if (subnet > 0xF) {
-            if (this->b_verbose) {
-                Serial.println(F("subnet should be less than 0xF"));
-            }
+            Log->println(F("subnet should be less than 0xF"));
             return;
         }
         if (universe > 0xF) {
-            if (this->b_verbose) {
-                Serial.println(F("universe should be less than 0xF"));
-            }
+            Log->println(F("universe should be less than 0xF"));
             return;
         }
         uint16_t u = ((uint16_t)net << 8) | ((uint16_t)subnet << 4) | (uint16_t)universe;
@@ -253,11 +239,11 @@ public:
                 n = num;
             } else {
                 n = size / 3;
-                Serial.println(F("WARN: ArtNet packet size is less than requested LED numbers to forward"));
-                Serial.print(F("      requested: "));
-                Serial.print(num * 3);
-                Serial.print(F("      received : "));
-                Serial.println(size);
+                Log->println(F("WARN: ArtNet packet size is less than requested LED numbers to forward"));
+                Log->print(F("      requested: "));
+                Log->print(num * 3);
+                Log->print(F("      received : "));
+                Log->println(size);
             }
             for (size_t pixel = 0; pixel < n; ++pixel) {
                 size_t idx = pixel * 3;
@@ -290,7 +276,7 @@ public:
 
     void verbose(bool b)
     {
-        this->b_verbose = b;
+        Log.enabled = b;
     }
 
 protected:
