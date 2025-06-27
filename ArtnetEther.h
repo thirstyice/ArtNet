@@ -15,8 +15,32 @@
 #include "Artnet/util/TeensyDirtySTLErrorSolution/TeensyDirtySTLErrorSolution.h"
 #include "Artnet/Manager.h"
 
+class ArtnetReceiverEther : public art_net::Receiver_ {
+	public:
+		ArtnetReceiverEther() : Receiver_(&udp) {
+		}
+	protected:
+		EthernetUDP udp;
+    IPAddress localIP() override
+    {
+        return Ethernet.localIP();
+    }
+    IPAddress subnetMask() override
+    {
+        return Ethernet.subnetMask();
+    }
+    inline void macAddress(uint8_t* mac) override
+    {
+        Ethernet.MACAddress(mac);
+    }
+		bool isNetworkReady() override
+		{
+			return true;
+		}
+}
+
 using Artnet = art_net::Manager<EthernetUDP>;
 using ArtnetSender = art_net::Sender<EthernetUDP>;
-using ArtnetReceiver = art_net::Receiver<EthernetUDP>;
+using ArtnetReceiver = ArtnetReceiverEther;
 
 #endif  // ARTNET_ETHER_H

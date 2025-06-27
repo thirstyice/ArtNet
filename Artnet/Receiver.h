@@ -21,10 +21,9 @@ static NoPrint no_log;
 
 } // namespace
 
-template <typename S>
 class Receiver_
 {
-    S *stream;
+    UDP *stream;
     Array<PACKET_SIZE> packet;
 
     art_dmx::CallbackMap callback_art_dmx_universes;
@@ -37,21 +36,20 @@ class Receiver_
     Print *logger {&no_log};
 
 public:
+    Receiver_(UDP* s) : stream(s)
+    {
 #if ARX_HAVE_LIBSTDCPLUSPLUS >= 201103L  // Have libstdc++11
 #else
-    Receiver_()
-    {
         this->packet.resize(PACKET_SIZE);
-    }
 #endif
+    }
 
     OpCode parse()
     {
-#ifdef ARTNET_ENABLE_WIFI
         if (!isNetworkReady()) {
             return OpCode::NoPacket;
         }
-#endif
+
         size_t size = this->stream->parsePacket();
         if (size == 0) {
             return OpCode::NoPacket;
@@ -73,8 +71,8 @@ public:
         }
 
         RemoteInfo remote_info;
-        remote_info.ip = this->stream->S::remoteIP();
-        remote_info.port = (uint16_t)this->stream->S::remotePort();
+        remote_info.ip = this->stream->remoteIP();
+        remote_info.port = (uint16_t)this->stream->remotePort();
 
         OpCode op_code = OpCode::Unsupported;
         OpCode received_op_code = static_cast<OpCode>(this->getOpCode());
@@ -348,10 +346,11 @@ public:
     }
 
 protected:
-    void attach(S& s)
-    {
-        this->stream = &s;
-    }
+
+    virtual IPAddress localIP() =0;
+    virtual IPAddress subnetMask() =0;
+    virtual void macAddress(uint8_t*) =0;
+    virtual bool isNetworkReady() =0;
 
 private:
 
@@ -422,96 +421,15 @@ private:
         return this->packet.data() + art_trigger::PAYLOAD;
     }
 
-#ifdef ARTNET_ENABLE_WIFI
-    template <typename T = S>
-    auto localIP() -> std::enable_if_t<std::is_same<T, WiFiUDP>::value, IPAddress>
-    {
-#if defined(ARDUINO_ARCH_ESP32) || defined(ARDUINO_ARCH_RP2040)
-        if( WiFi.getMode() == WIFI_AP ) {
-            return WiFi.softAPIP();
-        } else {
-            return WiFi.localIP();
-        }
-#else
-        return WiFi.localIP();
-#endif
-    }
-    template <typename T = S>
-    auto subnetMask() -> std::enable_if_t<std::is_same<T, WiFiUDP>::value, IPAddress>
-    {
-#if defined(ARDUINO_ARCH_ESP32)
-        if( WiFi.getMode() == WIFI_AP ) {
-            return WiFi.softAPSubnetMask();
-        } else {
-            return WiFi.subnetMask();
-        }
-#else
-        return WiFi.subnetMask();
-#endif
-    }
-    template <typename T = S>
-    auto macAddress(uint8_t* mac) -> std::enable_if_t<std::is_same<T, WiFiUDP>::value>
-    {
-#if defined(ARDUINO_ARCH_ESP32) || defined(ARDUINO_ARCH_RP2040)
-        if( WiFi.getMode() == WIFI_AP ) {
-            WiFi.softAPmacAddress(mac);
-        } else {
-            WiFi.macAddress(mac);
-        }
-#else
-        WiFi.macAddress(mac);
-#endif
-    }
-#endif  // ARTNET_ENABLE_WIFI
-
-#ifdef ARTNET_ENABLE_ETHER
-    template <typename T = S>
-    auto localIP() -> std::enable_if_t<std::is_same<T, EthernetUDP>::value, IPAddress>
-    {
-        return Ethernet.localIP();
-    }
-    template <typename T = S>
-    auto subnetMask() -> std::enable_if_t<std::is_same<T, EthernetUDP>::value, IPAddress>
-    {
-        return Ethernet.subnetMask();
-    }
-    template <typename T = S>
-    inline auto macAddress(uint8_t* mac) -> std::enable_if_t<std::is_same<T, EthernetUDP>::value>
-    {
-        Ethernet.MACAddress(mac);
-    }
-#endif  // ARTNET_ENABLE_ETHER
-
-#ifdef ARTNET_ENABLE_ETH
-    template <typename T = S>
-    auto localIP() -> std::enable_if_t<std::is_same<T, WiFiUDP>::value, IPAddress>
-    {
-        return ETH.localIP();
-    }
-    template <typename T = S>
-    auto subnetMask() -> std::enable_if_t<std::is_same<T, WiFiUDP>::value, IPAddress>
-    {
-        return ETH.subnetMask();
-    }
-    template <typename T = S>
-    auto macAddress(uint8_t* mac) -> std::enable_if_t<std::is_same<T, WiFiUDP>::value>
-    {
-        ETH.macAddress(mac);
-    }
-#endif  // ARTNET_ENABLE_ETH
-
 };
 
-template <typename S>
-class Receiver : public Receiver_<S>
-{
-    S stream;
-
+class Receiver : public Receiver_ {
+    UDP* stream;
 public:
+    Receiver(UDP* s) : Receiver_(s), stream(s) {}
     void begin(uint16_t recv_port = DEFAULT_PORT)
     {
-        this->stream.begin(recv_port);
-        this->Receiver_<S>::attach(this->stream);
+        this->stream->begin(recv_port);
     }
 };
 
