@@ -23,7 +23,6 @@ static NoPrint no_log;
 
 class Receiver_
 {
-    UDP *stream;
     Array<PACKET_SIZE> packet;
 
     art_dmx::CallbackMap callback_art_dmx_universes;
@@ -346,6 +345,7 @@ public:
     }
 
 protected:
+    UDP *stream;
 
     virtual IPAddress localIP() =0;
     virtual IPAddress subnetMask() =0;
@@ -424,9 +424,8 @@ private:
 };
 
 class Receiver : public Receiver_ {
-    UDP* stream;
 public:
-    Receiver(UDP* s) : Receiver_(s), stream(s) {}
+    Receiver(UDP* s) : Receiver_(s) {}
     void begin(uint16_t recv_port = DEFAULT_PORT)
     {
         this->stream->begin(recv_port);
