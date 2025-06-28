@@ -37,7 +37,7 @@ class ArtnetReceiverEther : public art_net::Receiver {
 		{
 			return true;
 		}
-}
+};
 
 using Artnet = art_net::Manager<EthernetUDP>;
 using ArtnetSender = art_net::Sender<EthernetUDP>;

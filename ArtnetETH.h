@@ -33,7 +33,7 @@ class ArtnetReceiverETH : public art_net::Receiver {
 		{
 			return true;
 		}
-}
+};
 
 // ETH.h is a library for Ethernet PHY, but we should use WiFi library's apis for sever/client
 using Artnet = art_net::Manager<WiFiUDP>;

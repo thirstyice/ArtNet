@@ -85,7 +85,7 @@ class ArtnetReceiverWiFi : public art_net::Receiver {
 #endif
             return is_connected || is_ap_active;
         }
-}
+};
 
 using ArtnetWiFi = art_net::Manager<WiFiUDP>;
 using ArtnetWiFiSender = art_net::Sender<WiFiUDP>;
