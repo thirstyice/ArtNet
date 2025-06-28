@@ -50,7 +50,31 @@ protected:
     }
 };
 
-using Artnet = art_net::Manager<EthernetUDP>;
+class ArtnetManagerEther : public art_net::Manager {
+public:
+    ArtnetManagerEther() : Manager(&udp) {
+    }
+protected:
+    EthernetUDP udp;
+    IPAddress localIP() override
+    {
+        return Ethernet.localIP();
+    }
+    IPAddress subnetMask() override
+    {
+        return Ethernet.subnetMask();
+    }
+    inline void macAddress(uint8_t* mac) override
+    {
+        Ethernet.MACAddress(mac);
+    }
+    bool isNetworkReady() override
+    {
+        return true;
+    }
+};
+
+using Artnet = ArtnetManagerEther;
 using ArtnetSender = ArtnetSenderEther;
 using ArtnetReceiver = ArtnetReceiverEther;
 

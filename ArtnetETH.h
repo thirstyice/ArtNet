@@ -36,6 +36,7 @@ protected:
         return true;
     }
 };
+
 class ArtnetSenderETH : public art_net::Sender {
 public:
     ArtnetSenderETH() : Sender(&udp) {}
@@ -47,7 +48,30 @@ protected:
     }
 };
 
-using Artnet = art_net::Manager<WiFiUDP>;
+class ArtnetManagerETH : public art_net::Manager {
+public:
+    ArtnetManagerETH() : Manager(&udp) {}
+protected:
+    WiFiUDP udp;
+    IPAddress localIP() override
+    {
+        return ETH.localIP();
+    }
+    IPAddress subnetMask() override
+    {
+        return ETH.subnetMask();
+    }
+    void macAddress(uint8_t* mac) override
+    {
+        ETH.macAddress(mac);
+    }
+    bool isNetworkReady() override
+    {
+        return true;
+    }
+};
+
+using Artnet = ArtnetManagerETH;
 using ArtnetSender = ArtnetSenderETH;
 using ArtnetReceiver = ArtnetReceiverETH;
 
