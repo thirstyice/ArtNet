@@ -2,7 +2,7 @@
 #ifndef ARTNET_ETH_H
 #define ARTNET_ETH_H
 
-#define ARTNET_ENABLE_ETH
+#define ARTNET_ETH
 
 #include <Arduino.h>
 #include <ArxTypeTraits.h>
@@ -38,8 +38,13 @@ protected:
     }
 };
 
+#ifndef ARTNET_DEFAULT_INTERFACE
+#define ARTNET_DEFAULT_INTERFACE ARTNET_ETH
+
 using Artnet = ArtnetETH<art_net::Manager>;
 using ArtnetSender = ArtnetETH<art_net::Sender>;
 using ArtnetReceiver = ArtnetETH<art_net::Receiver>;
+
+#endif // ARTNET_DEFAULT_INTERFACE
 
 #endif // ARTNET_ETH_H

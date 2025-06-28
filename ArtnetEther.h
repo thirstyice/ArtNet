@@ -2,12 +2,16 @@
 #ifndef ARTNET_ETHER_H
 #define ARTNET_ETHER_H
 
-#define ARTNET_ENABLE_ETHER
+#ifdef ARTNET_ETHER
+    #error "Only one kind of ArtnetEther is supported at once!
+#endif
+
+#define ARTNET_ETHER
 
 #include <Arduino.h>
 #include <ArxTypeTraits.h>
 #include <ArxContainer.h>
-#ifdef ARTNET_NATIVE_ETHER_H
+#ifdef ARTNET_NATIVE_ETHER
 	#include <NativeEthernetUdp.h>
 #else
 	#include <EthernetUdp.h>
@@ -40,8 +44,13 @@ protected:
     }
 };
 
+#ifndef ARTNET_DEFAULT_INTERFACE
+#define ARTNET_DEFAULT_INTERFACE ARTNET_ETHER
+
 using Artnet = ArtnetEther<art_net::Manager>;
 using ArtnetSender = ArtnetEther<art_net::Sender>;
 using ArtnetReceiver = ArtnetEther<art_net::Receiver>;
+
+#endif // ARTNET_DEFAULT_INTERFACE
 
 #endif  // ARTNET_ETHER_H

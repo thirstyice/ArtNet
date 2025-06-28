@@ -5,10 +5,10 @@
 #if defined(ESP_PLATFORM) || defined(ESP8266) || defined(ARDUINO_AVR_UNO_WIFI_REV2)                             \
     || defined(ARDUINO_SAMD_MKRWIFI1010) || defined(ARDUINO_SAMD_MKRVIDOR4000) || defined(ARDUINO_SAMD_MKR1000) \
     || defined(ARDUINO_SAMD_NANO_33_IOT) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_UNOR4_WIFI)
-#define ARTNET_ENABLE_WIFI
+#define ARTNET_WIFI
 #endif
 
-#ifdef ARTNET_ENABLE_WIFI
+#ifdef ARTNET_WIFI
 #include <Arduino.h>
 #include <ArxTypeTraits.h>
 #include <ArxContainer.h>
@@ -91,6 +91,16 @@ protected:
 using ArtnetWiFi = ArtnetWiFi<art_net::Manager>;
 using ArtnetWiFiSender = ArtnetWiFi<art_net::Sender>;
 using ArtnetWiFiReceiver = ArtnetWiFi<art_net::Receiver>;
-#endif  // ARTNET_ENABLE_WIFI
+
+#ifndef ARTNET_DEFAULT_INTERFACE
+#define ARTNET_DEFAULT_INTERFACE ARTNET_WIFI
+
+using Artnet = ArtnetWiFi;
+using ArtnetSender = ArtnetWiFiSender;
+using ArtnetReceiver = ArtnetWiFiReceiver;
+
+#endif // ARTNET_DEFAULT_INTERFACE
+
+#endif  // ARTNET_WIFI
 
 #endif  // ARTNET_WIFI_H
