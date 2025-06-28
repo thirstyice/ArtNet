@@ -12,11 +12,11 @@
 #include "Artnet/Manager.h"
 
 class ArtnetReceiverETH : public art_net::Receiver {
-	public:
-		ArtnetReceiverETH() : Receiver(&udp) {
-		}
-	protected:
-		WiFiUDP udp;
+public:
+    ArtnetReceiverETH() : Receiver(&udp) {
+    }
+protected:
+	WiFiUDP udp;
     IPAddress localIP() override
     {
         return ETH.localIP();
@@ -29,10 +29,10 @@ class ArtnetReceiverETH : public art_net::Receiver {
     {
         ETH.macAddress(mac);
     }
-		bool isNetworkReady() override
-		{
-			return true;
-		}
+    bool isNetworkReady() override
+    {
+        return true;
+    }
 };
 
 // ETH.h is a library for Ethernet PHY, but we should use WiFi library's apis for sever/client
