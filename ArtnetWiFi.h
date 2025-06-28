@@ -32,9 +32,10 @@
 #endif
 #include "Artnet/Manager.h"
 
-class ArtnetReceiverWiFi : public art_net::Receiver {
+template <class C>
+class ArtnetWiFi : public C {
 public:
-    ArtnetReceiverWiFi() : Receiver(&udp) {
+    ArtnetWiFi() : C(&udp) {
     }
 protected:
     WiFiUDP udp;
@@ -87,82 +88,9 @@ protected:
     }
 };
 
-class ArtnetSenderWiFi : public art_net::Sender {
-public:
-    ArtnetSenderWiFi() : Sender(&udp) {}
-protected:
-    WiFiUDP udp;
-    inline bool isNetworkReady() override
-    {
-        auto status = WiFi.status();
-        bool is_connected = status == WL_CONNECTED;
-#if defined(ARDUINO_ARCH_ESP32) || defined(ESP8266) || defined(ARDUINO_ARCH_RP2040)
-        bool is_ap_active = WiFi.getMode() == WIFI_AP;
-#else
-        bool is_ap_active = status == WL_AP_CONNECTED;
-#endif
-        return is_connected || is_ap_active;
-    }
-};
-
-class ArtnetManagerWiFi : public art_net::Manager {
-public:
-    ArtnetManagerWiFi() : Manager(&udp) {
-    }
-protected:
-    WiFiUDP udp;
-    IPAddress localIP() override
-    {
-#if defined(ARDUINO_ARCH_ESP32) || defined(ARDUINO_ARCH_RP2040)
-        if( WiFi.getMode() == WIFI_AP ) {
-            return WiFi.softAPIP();
-        } else {
-            return WiFi.localIP();
-        }
-#else
-        return WiFi.localIP();
-#endif
-    }
-    IPAddress subnetMask() override
-    {
-#if defined(ARDUINO_ARCH_ESP32)
-        if( WiFi.getMode() == WIFI_AP ) {
-            return WiFi.softAPSubnetMask();
-        } else {
-            return WiFi.subnetMask();
-        }
-#else
-        return WiFi.subnetMask();
-#endif
-    }
-    void macAddress(uint8_t* mac) override
-    {
-#if defined(ARDUINO_ARCH_ESP32) || defined(ARDUINO_ARCH_RP2040)
-        if( WiFi.getMode() == WIFI_AP ) {
-            WiFi.softAPmacAddress(mac);
-        } else {
-            WiFi.macAddress(mac);
-        }
-#else
-        WiFi.macAddress(mac);
-#endif
-    }
-    inline bool isNetworkReady() override
-    {
-        auto status = WiFi.status();
-        bool is_connected = status == WL_CONNECTED;
-#if defined(ARDUINO_ARCH_ESP32) || defined(ESP8266) || defined(ARDUINO_ARCH_RP2040)
-        bool is_ap_active = WiFi.getMode() == WIFI_AP;
-#else
-        bool is_ap_active = status == WL_AP_CONNECTED;
-#endif
-        return is_connected || is_ap_active;
-    }
-};
-
-using ArtnetWiFi = ArtnetManagerWiFi;
-using ArtnetWiFiSender = ArtnetSenderWiFi;
-using ArtnetWiFiReceiver = ArtnetReceiverWiFi;
+using ArtnetWiFi = ArtnetWiFi<art_net::Manager>;
+using ArtnetWiFiSender = ArtnetWiFi<art_net::Sender>;
+using ArtnetWiFiReceiver = ArtnetWiFi<art_net::Receiver>;
 #endif  // ARTNET_ENABLE_WIFI
 
 #endif  // ARTNET_WIFI_H

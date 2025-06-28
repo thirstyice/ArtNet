@@ -147,6 +147,11 @@ public:
 protected:
     UDP* stream;
 
+    virtual IPAddress localIP() =0;
+    virtual IPAddress subnetMask() =0;
+    virtual void macAddress(uint8_t*) =0;
+    virtual bool isNetworkReady() =0;
+
     void sendArxDmxInternal(const Destination &dest, uint8_t physical)
     {
         if (!isNetworkReady()) {
@@ -181,7 +186,6 @@ protected:
         this->stream->endPacket();
     }
 
-    virtual bool isNetworkReady() =0;
 };
 
 class Sender : public Sender_
