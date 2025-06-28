@@ -15,9 +15,9 @@
 #include "Artnet/util/TeensyDirtySTLErrorSolution/TeensyDirtySTLErrorSolution.h"
 #include "Artnet/Manager.h"
 
-class ArtnetReceiverEther : public art_net::Receiver_ {
+class ArtnetReceiverEther : public art_net::Receiver {
 	public:
-		ArtnetReceiverEther() : Receiver_(&udp) {
+		ArtnetReceiverEther() : Receiver(&udp) {
 		}
 	protected:
 		EthernetUDP udp;

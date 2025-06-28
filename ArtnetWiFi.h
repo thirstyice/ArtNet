@@ -32,9 +32,9 @@
 #endif
 #include "Artnet/Manager.h"
 
-class ArtnetReceiverWiFi : public art_net::Receiver_ {
+class ArtnetReceiverWiFi : public art_net::Receiver {
 	public:
-		ArtnetReceiverWiFi() : Receiver_(&udp) {
+		ArtnetReceiverWiFi() : Receiver(&udp) {
 		}
 	protected:
 		WiFiUDP udp;

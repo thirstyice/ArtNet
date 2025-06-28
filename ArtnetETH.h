@@ -11,9 +11,9 @@
 #include <WiFiUdp.h>
 #include "Artnet/Manager.h"
 
-class ArtnetReceiverETH : public art_net::Receiver_ {
+class ArtnetReceiverETH : public art_net::Receiver {
 	public:
-		ArtnetReceiverETH() : Receiver_(&udp) {
+		ArtnetReceiverETH() : Receiver(&udp) {
 		}
 	protected:
 		WiFiUDP udp;
