@@ -188,16 +188,16 @@ protected:
 
 };
 
-class Sender : public Sender_
+} // namespace art_net
+
+class ArtnetSenderParent : public art_net::Sender_
 {
 public:
-    Sender(UDP* s) : Sender_(s) {}
+    ArtnetSenderParent(UDP* s) : Sender_(s) {}
     void begin()
     {
-        this->stream->begin(DEFAULT_PORT);
+        this->stream->begin(art_net::DEFAULT_PORT);
     }
 };
-
-} // namespace art_net
 
 #endif // ARTNET_SENDER_H

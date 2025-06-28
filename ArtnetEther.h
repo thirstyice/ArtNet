@@ -20,9 +20,9 @@
 #include "Artnet/Manager.h"
 
 template <class C>
-class ArtnetEther : public C {
+class ArtnetOverEther : public C {
 public:
-    ArtnetEther() : C(&udp) {
+    ArtnetOverEther() : C(&udp) {
     }
 protected:
     EthernetUDP udp;
@@ -44,12 +44,16 @@ protected:
     }
 };
 
+using ArtnetEther = ArtnetOverEther<ArtnetParent>;
+using ArtnetEtherSender = ArtnetOverEther<ArtnetSenderParent>;
+using ArtnetEtherReceiver = ArtnetOverEther<ArtnetReceiverParent>
+
 #ifndef ARTNET_DEFAULT_INTERFACE
 #define ARTNET_DEFAULT_INTERFACE ARTNET_ETHER
 
-using Artnet = ArtnetEther<art_net::Manager>;
-using ArtnetSender = ArtnetEther<art_net::Sender>;
-using ArtnetReceiver = ArtnetEther<art_net::Receiver>;
+using Artnet = ArtnetEther;
+using ArtnetSender = ArtnetEtherSender;
+using ArtnetReceiver = ArtnetEtherReceiver;
 
 #endif // ARTNET_DEFAULT_INTERFACE
 

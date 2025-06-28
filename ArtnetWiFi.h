@@ -33,9 +33,9 @@
 #include "Artnet/Manager.h"
 
 template <class C>
-class ArtnetWiFi : public C {
+class ArtnetOverWiFi : public C {
 public:
-    ArtnetWiFi() : C(&udp) {
+    ArtnetOverWiFi() : C(&udp) {
     }
 protected:
     WiFiUDP udp;
@@ -88,9 +88,9 @@ protected:
     }
 };
 
-using ArtnetWiFi = ArtnetWiFi<art_net::Manager>;
-using ArtnetWiFiSender = ArtnetWiFi<art_net::Sender>;
-using ArtnetWiFiReceiver = ArtnetWiFi<art_net::Receiver>;
+using ArtnetWiFi = ArtnetOverWiFi<ArtnetParent>;
+using ArtnetWiFiSender = ArtnetOverWiFi<ArtnetSenderParent>;
+using ArtnetWiFiReceiver = ArtnetOverWiFi<ArtnetReceiverParent>;
 
 #ifndef ARTNET_DEFAULT_INTERFACE
 #define ARTNET_DEFAULT_INTERFACE ARTNET_WIFI

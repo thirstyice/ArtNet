@@ -423,15 +423,17 @@ private:
 
 };
 
-class Receiver : public Receiver_ {
+} // namespace art_net
+
+class ArtnetReceiverParent : public art_net::Receiver_ {
 public:
-    Receiver(UDP* s) : Receiver_(s) {}
-    void begin(uint16_t recv_port = DEFAULT_PORT)
+    ArtnetReceiverParent(UDP* s) : Receiver_(s) {}
+    void begin(uint16_t recv_port = art_net::DEFAULT_PORT)
     {
         this->stream->begin(recv_port);
     }
 };
 
-} // namespace art_net
+
 
 #endif // ARTNET_RECEIVER_H

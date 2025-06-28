@@ -14,9 +14,9 @@
 // ETH.h is a library for Ethernet PHY, but we should use WiFi library's apis for sever/client
 
 template <class C>
-class ArtnetETH : public C {
+class ArtnetOverETH : public C {
 public:
-    ArtnetETH() : C(&udp) {
+    ArtnetOverETH() : C(&udp) {
     }
 protected:
 	WiFiUDP udp;
@@ -38,12 +38,16 @@ protected:
     }
 };
 
+using ArtnetETH = ArtnetOverETH<ArtnetParent>;
+using ArtnetETHSender = ArtnetOverETH<ArtnetSenderParent>;
+using ArtnetETHReceiver = ArtnetOverETH<ArtnetReceiverParent>;
+
 #ifndef ARTNET_DEFAULT_INTERFACE
 #define ARTNET_DEFAULT_INTERFACE ARTNET_ETH
 
-using Artnet = ArtnetETH<art_net::Manager>;
-using ArtnetSender = ArtnetETH<art_net::Sender>;
-using ArtnetReceiver = ArtnetETH<art_net::Receiver>;
+using Artnet = ArtnetETH;
+using ArtnetSender = ArtnetETHSender;
+using ArtnetReceiver = ArtnetETHReceiver;
 
 #endif // ARTNET_DEFAULT_INTERFACE
 
