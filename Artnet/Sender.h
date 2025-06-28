@@ -10,23 +10,21 @@
 
 namespace art_net {
 
-template <typename S>
 class Sender_
 {
-    S* stream;
     Array<PACKET_SIZE> packet;
     LastSendTimeMsMap last_send_times;
     SequenceMap dmx_sequences;
     SequenceMap nzs_sequences;
 
 public:
+    Sender_(UDP* s) : stream(s)
+    {
 #if ARX_HAVE_LIBSTDCPLUSPLUS >= 201103L  // Have libstdc++11
 #else
-    Sender_()
-    {
         this->packet.resize(PACKET_SIZE);
-    }
 #endif
+    }
 
     // streaming artdmx packet
     void setArtDmxData(const uint8_t* const data, uint16_t size)
@@ -147,18 +145,14 @@ public:
     }
 
 protected:
-    void attach(S& s)
-    {
-        this->stream = &s;
-    }
+    UDP* stream;
 
     void sendArxDmxInternal(const Destination &dest, uint8_t physical)
     {
-#ifdef ARTNET_ENABLE_WIFI
         if (!isNetworkReady()) {
             return;
         }
-#endif
+
         if (this->dmx_sequences.find(dest) == this->dmx_sequences.end()) {
             this->dmx_sequences.insert(std::make_pair(dest, uint8_t(0)));
         }
@@ -169,11 +163,9 @@ protected:
 
     void sendArxNzsInternal(const Destination &dest, uint8_t start_code)
     {
-#ifdef ARTNET_ENABLE_WIFI
         if (!isNetworkReady()) {
             return;
         }
-#endif
         if (this->nzs_sequences.find(dest) == this->nzs_sequences.end()) {
             this->nzs_sequences.insert(std::make_pair(dest, uint8_t(0)));
         }
@@ -188,18 +180,17 @@ protected:
         this->stream->write(data, size);
         this->stream->endPacket();
     }
+
+    virtual bool isNetworkReady() =0;
 };
 
-template <typename S>
-class Sender : public Sender_<S>
+class Sender : public Sender_
 {
-    S stream;
-
 public:
+    Sender(UDP* s) : Sender_(s) {}
     void begin()
     {
-        this->stream.begin(DEFAULT_PORT);
-        this->Sender_<S>::attach(this->stream);
+        this->stream->begin(DEFAULT_PORT);
     }
 };
 

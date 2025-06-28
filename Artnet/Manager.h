@@ -7,16 +7,15 @@
 
 namespace art_net {
 
-class Manager : public Sender_<S>, Receiver_
+class Manager : public Sender_, public Receiver_
 {
     UDP* stream;
 
 public:
-    Manager(UDP* s) : Receiver_(s), stream(s) {}
+    Manager(UDP* s) : Sender_(s), Receiver_(s), stream(s) {}
     void begin(uint16_t recv_port = DEFAULT_PORT)
     {
         this->stream->begin(recv_port);
-        this->Sender_<S>::attach(this->stream);
     }
 };
 

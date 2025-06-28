@@ -87,8 +87,26 @@ protected:
     }
 };
 
+class ArtnetSenderWiFi : public art_net::Sender {
+public:
+    ArtnetSenderWiFi() : Sender(&udp) {}
+protected:
+    WiFiUDP udp;
+    inline bool isNetworkReady() override
+    {
+        auto status = WiFi.status();
+        bool is_connected = status == WL_CONNECTED;
+#if defined(ARDUINO_ARCH_ESP32) || defined(ESP8266) || defined(ARDUINO_ARCH_RP2040)
+        bool is_ap_active = WiFi.getMode() == WIFI_AP;
+#else
+        bool is_ap_active = status == WL_AP_CONNECTED;
+#endif
+        return is_connected || is_ap_active;
+    }
+};
+
 using ArtnetWiFi = art_net::Manager<WiFiUDP>;
-using ArtnetWiFiSender = art_net::Sender<WiFiUDP>;
+using ArtnetWiFiSender = ArtnetSenderWiFi;
 using ArtnetWiFiReceiver = ArtnetReceiverWiFi;
 #endif  // ARTNET_ENABLE_WIFI
 

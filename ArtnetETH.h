@@ -11,6 +11,8 @@
 #include <WiFiUdp.h>
 #include "Artnet/Manager.h"
 
+// ETH.h is a library for Ethernet PHY, but we should use WiFi library's apis for sever/client
+
 class ArtnetReceiverETH : public art_net::Receiver {
 public:
     ArtnetReceiverETH() : Receiver(&udp) {
@@ -34,10 +36,19 @@ protected:
         return true;
     }
 };
+class ArtnetSenderETH : public art_net::Sender {
+public:
+    ArtnetSenderETH() : Sender(&udp) {}
+protected:
+    WiFiUDP udp;
+    bool isNetworkReady() override
+    {
+        return true;
+    }
+};
 
-// ETH.h is a library for Ethernet PHY, but we should use WiFi library's apis for sever/client
 using Artnet = art_net::Manager<WiFiUDP>;
-using ArtnetSender = art_net::Sender<WiFiUDP>;
+using ArtnetSender = ArtnetSenderETH;
 using ArtnetReceiver = ArtnetReceiverETH;
 
 #endif // ARTNET_ETH_H

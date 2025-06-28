@@ -39,8 +39,19 @@ protected:
     }
 };
 
+class ArtnetSenderEther : public art_net::Sender {
+public:
+    ArtnetSenderEther() : Sender(&udp) {}
+protected:
+    WiFEthernetUDP udp;
+    bool isNetworkReady() override
+    {
+        return true;
+    }
+};
+
 using Artnet = art_net::Manager<EthernetUDP>;
-using ArtnetSender = art_net::Sender<EthernetUDP>;
+using ArtnetSender = ArtnetSenderEther;
 using ArtnetReceiver = ArtnetReceiverEther;
 
 #endif  // ARTNET_ETHER_H
